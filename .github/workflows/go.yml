@@ -15,13 +15,13 @@ jobs:
           go-version: 1.19
 
       - name: Install dependencies
-        run: go get .
+        run: cd src && go get .
 
       - name: Build
-        run: go build -v ./...
+        run: cd src && go build -v ./...
 
       - name: Test with the Go CLI
-        run: go test
+        run: cd src && go test
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master

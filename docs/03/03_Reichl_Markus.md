@@ -52,13 +52,13 @@ jobs:
           go-version: ${{ matrix.go-version }}}
 
       - name: Install dependencies
-        run: go get .
+        run: cd src && go get .
 
       - name: Build
-        run: go build -v ./...
+        run: cd src && go build -v ./...
 
       - name: Test with the Go CLI
-        run: go test
+        run: cd src && go test
 ```
 
 This will start a PostgreSQL database container, setup Go and run the unit tests.
