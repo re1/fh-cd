@@ -15,13 +15,17 @@ jobs:
           go-version: 1.19
 
       - name: Install dependencies
-        run: cd src && go get .
+        run: go get .
 
       - name: Build
-        run: cd src && go build -v ./...
+        run: go build -v ./...
 
       - name: Test with the Go CLI
-        run: cd src && go test
+        run: go test
+        env:
+          APP_DB_USERNAME: postgres
+          APP_DB_PASSWORD: postgres
+          APP_DB_NAME: postgres
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
