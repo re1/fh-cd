@@ -26,15 +26,33 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go-version: ["1.19"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.19
+
+      - name: Install dependencies
+        run: go get .
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test with the Go CLI
+        run: go test
+        env:
+          APP_DB_USERNAME: postgres
+          APP_DB_PASSWORD: postgres
+          APP_DB_NAME: postgres
 
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: ${{ secrets.APP_DB_PASSWORD }}
+          POSTGRES_PASSWORD: postgres
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -42,34 +60,9 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Go ${{ matrix.go-version }}
-        uses: actions/setup-go@v4
-        with:
-          go-version: ${{ matrix.go-version }}}
-
-      - name: Install dependencies
-        run: cd src && go get .
-
-      - name: Build
-        run: cd src && go build -v ./...
-
-      - name: Test with the Go CLI
-        run: cd src && go test
 ```
 
 This will start a PostgreSQL database container, setup Go and run the unit tests.
-
-The application will require multiple environment variables to run, which can be configured in the repository settings under "Settings > Secrets and variables > Actions > Variables (Tab)". The following repository variables are required:
-
-```bash
-APP_DB_USERNAME=postgres
-APP_DB_PASSWORD=postgres
-APP_DB_NAME=postgres
-```
 
 ## SonarCloud
 
@@ -78,12 +71,14 @@ SonarCloud is a cloud-based code quality and security service. It can be used to
 Sign up for [SonarCloud](https://sonarcloud.io/) using your GitHub account and create a new project for the repository.
 Public projects should already start to analyze on new commits.
 
-To configure automatic analysis of the project, a `sonar-project.properties` file can be added to the root directory of the project. The file requires at least the following properties:
+To configure manual analysis of the project, a `sonar-project.properties` file can be added to the root directory of the project. The file requires at least the following properties:
 
 ```properties
 sonar.projectKey=<project name>
 sonar.organization=<organization or username>
 ```
+
+Make sure to also disable automatic analysis in the SonarCloud settings.
 
 ### Adding SonarCloud to the GitHub Actions workflow
 
@@ -96,6 +91,6 @@ In order to add SonarCloud checks to the GitHub Actions workflow, add the follow
     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 ```
 
-This also requires the SONAR_TOKEN property to be set in the repository settings as previously described in the GitHub Actions section.
+To set the token navigate to "Settings > Secrets and variables > Actions > Secrets (Tab)" and add a new secret with the name `SONAR_TOKEN` and the value of the token from the SonarCloud project settings.
 
 Further information on using SonarCloud with GitHub Actions can be found in the [SonarCloud documentation](https://docs.sonarcloud.io/getting-started/github/).
