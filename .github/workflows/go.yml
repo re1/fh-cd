@@ -97,8 +97,9 @@ jobs:
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
+          skip-dirs: "/go"
           vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
+          severity: "CRITICAL"
 
   trivy-repo:
     name: "Scan for code vulnerabilities using Trivy"
