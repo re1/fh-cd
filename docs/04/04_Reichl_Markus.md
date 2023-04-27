@@ -154,7 +154,8 @@ Based on the instructions found in the [Trivy repository](https://github.com/aqu
     severity: "CRITICAL"
 ```
 
-As this
+This scan will fail by default for this repo due to external dependencies.
+To prevent this for this exercise the build will only fail for critical severity.
 
 ### Repository Scan
 
