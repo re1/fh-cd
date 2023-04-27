@@ -96,7 +96,7 @@ jobs:
       - name: Run Trivy vulnerability scanner for in docker mode
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "docker.io/re1coy/fh-cd:${{ github.sha }}"
+          image-ref: "re1coy/fh-cd:${{ github.sha }}"
           format: "table"
           exit-code: "1"
           ignore-unfixed: true
