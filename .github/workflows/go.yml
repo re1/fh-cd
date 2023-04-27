@@ -84,15 +84,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  trivy:
+  trivy-docker:
     needs: hub
-    name: "Scan for vulnerabilities using Trivy"
+    name: "Scan for docker vulnerabilities using Trivy"
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v3
-
       - name: Run Trivy vulnerability scanner for in docker mode
         uses: aquasecurity/trivy-action@master
         with:
@@ -102,6 +99,14 @@ jobs:
           ignore-unfixed: true
           vuln-type: "os,library"
           severity: "CRITICAL,HIGH"
+
+  trivy-repo:
+    name: "Scan for code vulnerabilities using Trivy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
       - name: Run Trivy vulnerability scanner in repo mode
         uses: aquasecurity/trivy-action@master
