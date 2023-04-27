@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
   build:
+    name: Build and test the application
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +28,39 @@ jobs:
           APP_DB_PASSWORD: postgres
           APP_DB_NAME: postgres
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+  sonar:
+    name: Scan for code quality using SonarCloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  trivy:
+    name: "Scan for vulnerabilities using Trivy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
       - name: Run Trivy vulnerability scanner for in docker mode
         uses: aquasecurity/trivy-action@master
@@ -51,22 +81,10 @@ jobs:
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
   hub:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -82,7 +100,7 @@ jobs:
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: re1coy/fh-cd
-          tags: type=sha
+          tags: type=sha,format=long
 
       - name: Build and push Docker image
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
