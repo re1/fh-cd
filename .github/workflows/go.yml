@@ -27,6 +27,11 @@ jobs:
           APP_DB_PASSWORD: postgres
           APP_DB_NAME: postgres
 
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
     services:
       postgres:
         image: postgres
@@ -39,15 +44,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-
-  scan:
-    name: "Scan code using SonarCloud"
-    runs-on: ubuntu-latest
-    steps:
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   hub:
     name: Push Docker image to Docker Hub
